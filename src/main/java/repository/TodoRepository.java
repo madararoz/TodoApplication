@@ -45,4 +45,47 @@ public class TodoRepository {
         }
         return todoItems;
     }
+
+    public void deleteTask(int todoId) throws SQLException {
+        Connection connection = dbHandler.getConnection();
+        String query = "DELETE FROM todos WHERE id = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, todoId);
+
+        preparedStatement.execute();
+    }
+
+    public Todo getTodoFromDB(int todoId) throws SQLException {
+        Todo todo = null;
+        String query = "SELECT * FROM todos WHERE id = " + todoId;
+        PreparedStatement preparedStatement = dbHandler.getConnection().prepareStatement(query);
+        ResultSet result = preparedStatement.executeQuery();
+
+
+        if(result.next()) {
+            todo = new Todo(
+                    result.getInt("id"),
+                    result.getString("description"),
+                    result.getDate("dueDate"),
+                    result.getTime("dueTime"),
+                    Status.valueOf(result.getString("status"))
+
+            );
+        }
+        return todo;
+
+    }
+
+    public void updateTask(int todoId, Status newStatus) throws SQLException {
+        Connection connection = dbHandler.getConnection();
+        String query = "UPDATE todos SET status = ? WHERE id = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, newStatus.toString());
+        preparedStatement.setInt(2, todoId);
+
+
+
+        preparedStatement.execute();
+
+    }
 }

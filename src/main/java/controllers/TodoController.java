@@ -15,43 +15,63 @@ public class TodoController {
 
     public void addTodo() {
         Todo todo = collectTodoInfo();
-        try{
+        try {
             todoRepository.addTodoToDB(todo);
-        } catch (Exception ex){
-          ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
 
     }
 
+    public void removeTodo(){
+        int todoId = Integer.parseInt(getUserInput("id of task to delete"));
 
-
-
-    public void updateTodo(){
-
-    }
-
-    public void viewTodo(){
-
-        ArrayList<Todo> todoList = new ArrayList<>();
         try {
-            todoList = todoRepository.getAllTodoFromDB();
+            todoRepository.deleteTask(todoId);
+            System.out.println("Task removed succesfully");
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
 
-       Todo todo = findTaskByDescription((getUserInput("task description you would like to view")), todoList);
+    }
+
+
+    public void updateTodo(){
+        int todoId = Integer.parseInt(getUserInput("id of task to update"));
+        int userChoice = JOptionPane.showConfirmDialog(null, "Is task complete?");
+        System.out.println(userChoice);
+        if(userChoice == 2) return;
+       Status newStatus = userChoice == 0 ? Status.COMPLETED : Status.PENDING;
+        try {
+            todoRepository.updateTask(todoId, newStatus);
+            System.out.println("Todo status changed");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
 
     }
 
-    private Todo findTaskByDescription(String todoDescription, ArrayList<Todo> todoList) {
-            for(Todo todo: todoList ){
-                if(todo.getDescription().equalsIgnoreCase(todoDescription) ) {
-                    System.out.println(todo.getId() +"\t" + todo.getStatus() + "\t" + todo.getDueDate() + "\t " + todo.getDueTime() + "\t" + todo.getDescription());
-                    return todo;
-                }
-            } return null;
+    public void viewTodo(){
+        Todo todo = null;
+
+        try {
+            int todoId = Integer.parseInt(getUserInput("id of task to view"));
+            todo = todoRepository.getTodoFromDB(todoId);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        System.out.println(todo);
     }
+
+//    private Todo findTaskByDescription(String todoDescription, ArrayList<Todo> todoList) {
+//            for(Todo todo: todoList ){
+//                if(todo.getDescription().equalsIgnoreCase(todoDescription) ) {
+//                    System.out.println(todo.getId() +"\t" + todo.getStatus() + "\t" + todo.getDueDate() + "\t " + todo.getDueTime() + "\t" + todo.getDescription());
+//                    return todo;
+//                }
+//            } return null;
+//    }
 
 
 
@@ -68,9 +88,7 @@ public class TodoController {
         displayTodoList(todoList);
     }
 
-    public void removeTodo(){
 
-    }
 
 
     private Todo collectTodoInfo() {
